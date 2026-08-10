@@ -1,0 +1,7 @@
+audit_results/
+venv/
+.git/
+__pycache__/
+*.pyc
+.env
+tests/

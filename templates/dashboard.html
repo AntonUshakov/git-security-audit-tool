@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Security Auditor - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1f2937;
+            --secondary: #374151;
+            --accent: #0f766e;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light: #f9fafb;
+            --border: #e5e7eb;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, #111827 100%);
+            color: var(--primary);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 40px 30px;
+            border-bottom: 4px solid var(--accent);
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--accent);
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .button-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, #14b8a6 100%);
+            color: white;
+        }
+
+        .button-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(15, 118, 110, 0.3);
+        }
+
+        .button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .status-card {
+            background: linear-gradient(135deg, var(--light) 0%, white 100%);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        .status-value {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .progress-container {
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent) 0%, #14b8a6 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .results-container {
+            display: none;
+            margin-top: 40px;
+        }
+
+        .results-container.visible {
+            display: block;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 3em;
+            font-weight: 700;
+        }
+
+        .score-circle.excellent {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .score-circle.good {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .score-circle.warning {
+            background: linear-gradient(135deg, #ef9546 0%, #f97316 100%);
+        }
+
+        .score-circle.critical {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .score-label {
+            font-size: 0.5em;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+
+        .report-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .button-secondary {
+            background: var(--border);
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .button-secondary:hover {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--danger);
+            color: var(--danger);
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .error-message.visible {
+            display: block;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(15, 118, 110, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .footer {
+            background: var(--light);
+            padding: 20px 30px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--secondary);
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.6em;
+            }
+
+            .content {
+                padding: 20px 15px;
+            }
+
+            .score-circle {
+                width: 150px;
+                height: 150px;
+                font-size: 2em;
+            }
+
+            .report-links {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 GitHub Security Auditor</h1>
+            <p>Comprehensive security audit for your GitHub organization</p>
+        </div>
+
+        <div class="content">
+            <!-- Audit Control -->
+            <div class="section">
+                <div class="section-title">Run Audit</div>
+                <button class="button button-primary" id="startAuditBtn" onclick="startAudit()">
+                    Start Audit
+                </button>
+                <div class="error-message" id="errorMessage"></div>
+            </div>
+
+            <!-- Status -->
+            <div class="section">
+                <div class="section-title">Audit Status</div>
+                <div class="status-card">
+                    <div class="status-item">
+                        <span class="status-label">Status:</span>
+                        <span class="status-value" id="statusText">Ready</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Progress:</span>
+                        <span class="status-value" id="progressText">0%</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div class="section results-container" id="resultsContainer">
+                <div class="section-title">Results</div>
+                
+                <div class="status-card" style="text-align: center;">
+                    <div class="score-circle" id="scoreCircle">
+                        <span id="scoreValue">-</span>
+                        <span class="score-label">Compliance Score</span>
+                    </div>
+                    <div id="riskLevel" style="font-size: 1.3em; font-weight: 600; margin-bottom: 20px;"></div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; text-align: center;">
+                        <div>
+                            <div style="font-size: 2em; font-weight: 700; color: var(--success);" id="passedCount">-</div>
+                            <div style="color: var(--secondary);">Passed</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 2em; font-weight: 700; color: var(--danger);" id="failedCount">-</div>
+                            <div style="color: var(--secondary);">Failed</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 2em; font-weight: 700; color: var(--accent);" id="totalCount">-</div>
+                            <div style="color: var(--secondary);">Total</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-links">
+                    <a href="#" class="button button-secondary" id="htmlReportBtn" onclick="downloadReport('html'); return false;">
+                        📊 Download HTML Report
+                    </a>
+                    <a href="#" class="button button-secondary" id="jsonReportBtn" onclick="downloadReport('json'); return false;">
+                        📋 Download JSON Report
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>🔒 GitHub Security Auditor | Based on 21 GitHub Security Best Practices</p>
+        </div>
+    </div>
+
+    <script>
+        const UPDATE_INTERVAL = 500; // ms
+        let statusCheckInterval = null;
+
+        async function startAudit() {
+            const btn = document.getElementById('startAuditBtn');
+            btn.disabled = true;
+            document.getElementById('errorMessage').classList.remove('visible');
+            document.getElementById('resultsContainer').classList.remove('visible');
+
+            try {
+                const response = await fetch('/api/audit/start', { method: 'POST' });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to start audit');
+                }
+
+                updateStatus();
+                statusCheckInterval = setInterval(updateStatus, UPDATE_INTERVAL);
+            } catch (error) {
+                showError(error.message);
+                btn.disabled = false;
+            }
+        }
+
+        async function updateStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const status = await response.json();
+
+                document.getElementById('statusText').textContent = 
+                    status.running ? '🔄 Auditing...' : '✅ Completed';
+                document.getElementById('progressText').textContent = status.progress + '%';
+                document.getElementById('progressBar').style.width = status.progress + '%';
+
+                if (status.error) {
+                    showError(status.error);
+                    clearInterval(statusCheckInterval);
+                    document.getElementById('startAuditBtn').disabled = false;
+                }
+
+                if (status.has_results && !status.running) {
+                    clearInterval(statusCheckInterval);
+                    await displayResults();
+                    document.getElementById('startAuditBtn').disabled = false;
+                }
+            } catch (error) {
+                showError('Failed to fetch status: ' + error.message);
+            }
+        }
+
+        async function displayResults() {
+            try {
+                const response = await fetch('/api/results');
+                const results = await response.json();
+
+                const summary = results.summary;
+                const score = summary.compliance_score;
+
+                // Determine score class
+                let scoreClass = 'excellent';
+                if (score < 50) scoreClass = 'critical';
+                else if (score < 70) scoreClass = 'warning';
+                else if (score < 90) scoreClass = 'good';
+
+                document.getElementById('scoreCircle').className = 'score-circle ' + scoreClass;
+                document.getElementById('scoreValue').textContent = Math.round(score);
+                document.getElementById('riskLevel').textContent = summary.risk_level;
+                document.getElementById('passedCount').textContent = summary.passed_checks;
+                document.getElementById('failedCount').textContent = summary.failed_checks;
+                document.getElementById('totalCount').textContent = summary.total_checks;
+
+                document.getElementById('resultsContainer').classList.add('visible');
+            } catch (error) {
+                showError('Failed to display results: ' + error.message);
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = '❌ ' + message;
+            errorDiv.classList.add('visible');
+        }
+
+        function downloadReport(format) {
+            const url = format === 'html' ? '/api/report/html' : '/api/report/json';
+            const filename = `github-audit-${new Date().toISOString().split('T')[0]}.${format}`;
+
+            fetch(url)
+                .then(response => response.blob())
+                .then(blob => {
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                })
+                .catch(error => showError('Download failed: ' + error.message));
+        }
+    </script>
+</body>
+</html>

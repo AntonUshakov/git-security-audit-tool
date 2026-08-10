@@ -1,0 +1,49 @@
+[
+  {
+    "type": "deletion",
+    "ruleset_source_type": "Organization",
+    "ruleset_source": "microsoft",
+    "ruleset_id": 5351760
+  },
+  {
+    "type": "non_fast_forward",
+    "ruleset_source_type": "Organization",
+    "ruleset_source": "microsoft",
+    "ruleset_id": 5351760
+  },
+  {
+    "type": "pull_request",
+    "parameters": {
+      "required_approving_review_count": 1,
+      "dismiss_stale_reviews_on_push": false,
+      "required_reviewers": [],
+      "require_code_owner_review": true,
+      "require_last_push_approval": true,
+      "required_review_thread_resolution": false,
+      "allowed_merge_methods": [
+        "merge",
+        "squash",
+        "rebase"
+      ]
+    },
+    "ruleset_source_type": "Organization",
+    "ruleset_source": "microsoft",
+    "ruleset_id": 5351760
+  },
+  {
+    "type": "deletion",
+    "ruleset_source_type": "Repository",
+    "ruleset_source": "microsoft/vscode",
+    "ruleset_id": 7988222
+  },
+  {
+    "type": "copilot_code_review",
+    "parameters": {
+      "review_on_push": false,
+      "review_draft_pull_requests": true
+    },
+    "ruleset_source_type": "Repository",
+    "ruleset_source": "microsoft/vscode",
+    "ruleset_id": 7988222
+  }
+]
