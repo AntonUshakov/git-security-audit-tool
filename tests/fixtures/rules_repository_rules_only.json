@@ -1,0 +1,22 @@
+[
+  {
+    "type": "repository_visibility",
+    "ruleset_source_type": "Organization"
+  },
+  {
+    "type": "repository_name",
+    "ruleset_source_type": "Organization"
+  },
+  {
+    "type": "repository_create",
+    "ruleset_source_type": "Organization"
+  },
+  {
+    "type": "repository_delete",
+    "ruleset_source_type": "Organization"
+  },
+  {
+    "type": "repository_transfer",
+    "ruleset_source_type": "Organization"
+  }
+]
